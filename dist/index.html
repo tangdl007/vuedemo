@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        {{name}}  {{age}}
+    </div>
+    <script src="./vue.js"></script>
+    <script>
+        //响应式的数据变化 数据变化之后我们能监控到
+        const vm = new Vue({
+            data:{
+                name:"zf",
+                age:12,
+                adress:{
+                    number:100,
+                    content:"回龙观"
+                },
+                hobby:['drink','eat',{a:1}]
+            },
+            el:"#app",  //将数据解析到el元素上
+        })
+        vm.hobby.push("333")
+        // console.log(vm._data.hobby[2].a);
+
+        //解析模板参数
+
+        //模板引擎  性能差  正则匹配  
+        // 虚拟dom 数据变化后比较虚拟dom的差异 最后更新需要更新的地方
+        //核心就是我们要把模板解析成js语法，通过js语法生成虚拟dom
+
+
+    </script>
+</body>
+</html>
