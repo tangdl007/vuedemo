@@ -5,9 +5,64 @@
 })(this, (function () { 'use strict';
 
     //正则表达式
-    function compileToFunction(template) {//将template生成ast抽象语法树
+    var ncname = "[a-zA-Z_][\\-\\.0-9_a-zA-Z]*";
+    var qnameCapture = "((?:".concat(ncname, "\\:)?").concat(ncname, ")");
+    var startTagOpen = new RegExp("^<".concat(qnameCapture)); //匹配到的是标签名
+
+    var attribute = /^\s*([^\s"'<>\/=]+)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/; //匹配属性
+
+    var startTagClose = /^\s*(\/?)>/;
+
+    function parseHTML(html) {
+      //解析一个删除一个 知道没有解析的为止
+      function advance(n) {
+        html = html.substring(n); //匹配一点截取一点
+      }
+
+      function parseStart() {
+        var start = html.match(startTagOpen);
+
+        if (start) {
+          var match = {
+            tagName: start[1],
+            //标签名
+            attrs: []
+          };
+          advance(start[0].length);
+          console.log(match);
+        }
+
+        var attr, end; //赋值的话加一个括号就行 匹配的值
+
+        while (!(end = html.match(startTagClose)) && (attr = html.match(attribute))) {
+          //如果标签没有结束就一直匹配
+          advance(attr[0].length);
+        }
+
+        if (end) {
+          advance(end[0].length);
+        }
+
+        console.log(html);
+        return false;
+      }
+
+      while (html) {
+        //如果为0则是标签开始的位置，如果大于0  文本结束的位置
+        var textEnd = html.indexOf("<");
+
+        if (textEnd == 0) {
+          parseStart();
+          break;
+        }
+      }
+    }
+
+    function compileToFunction(template) {
+      //将template生成ast抽象语法树
       //生成render函数
       //render函数执行的结果就是 虚拟dom
+      parseHTML(template);
     }
 
     function _typeof(obj) {
@@ -221,7 +276,7 @@
 
 
           if (template) {
-            var render = compileToFunction();
+            var render = compileToFunction(template);
             opts.render = render;
           }
         }
