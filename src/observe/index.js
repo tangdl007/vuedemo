@@ -1,4 +1,5 @@
 import { newArrayProto } from "./array";
+import Dep from "./dep";
 
 class Observer{
     constructor(data){
@@ -8,7 +9,7 @@ class Observer{
             enumerable:false   //不可枚举 循环取不到
         })
         // data.__ob__ = this; //如果数组有__ob__则说明数据并观测过了   如果是对象的话进入死循环
-        //数组的方法进行拦截
+        //数组的方法进行拦截  在中间加了一个
         if(Array.isArray(data)){
             this.observeArr(data);
             data.__proto__ = newArrayProto;
@@ -28,13 +29,18 @@ class Observer{
 
 export function defineReactive(target,key,value){ //闭包 这里的执行栈并没有被销毁 get和set方法能拿到value
     observe(value);
+    let dep = new Dep();  //每一个属性增加一个dep属性
     Object.defineProperty(target,key,{
         get(){
+            if(Dep.target){
+                dep.depend(); //属性收集器记住当前的watcher
+            }
             return value
         },
         set(newValue){
             if(value === newValue)return;
-            value = newValue
+            value = newValue;
+            dep.notify(); // 通知更新
         }
     })
 }
@@ -48,10 +54,4 @@ export function observe (data){
     return new Observer(data);
 }
 
-
-//深度劫持    一个函数里面调用原来的函数    重写数组的方法并且观察数组中的每一项
-
-
-//数组劫持的核心 就是重写数组的方法 并观察每一项
-
-//不可枚举  不能循环  不能取值
+//异步更新的操作

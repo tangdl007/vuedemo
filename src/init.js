@@ -1,16 +1,21 @@
 import { compileToFunction } from "./compiler";
+import { callHook, mountComponent } from "./lifecycle";
 import { initState } from "./state";
+import { mergerOptions } from "./utils";
 
 export function initMixin(Vue){
     Vue.prototype._init = function(options){  //原型中的this指的都是实例
         const vm = this;
-        vm.$options = options;  //$表示vue里面的变量  将用户的选项挂载到实例上
+        vm.$options = mergerOptions(this.constructor.options,options);  //$表示vue里面的变量  将用户的选项挂载到实例上
+        
+        callHook(vm,"beforeCreated");
         //初始化数据
         initState(vm);
+        callHook(vm,'created');   //这里面就已经执行了
 
 
         if(options.el){
-            vm.$mount(options.el);  //实现数据的挂载
+            vm.$mount(options.el);  //实现数据的挂载 第一次合并的时候父亲就是
         }
     }
 
@@ -32,12 +37,13 @@ export function initMixin(Vue){
 
             //如果有模板就进行编译
 
-            if(template){
+            if(template && el){
                 const render = compileToFunction(template);
                 opts.render = render
             }
-        }
-        opts.render; //统一成了render方法
+        }   
+
+        mountComponent(vm,el); //组件的挂载
     }
 }
 

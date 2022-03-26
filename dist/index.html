@@ -7,11 +7,11 @@
     <title>Document</title>
 </head>
 <body>
-    <div id="app">
-        <div style="color:red">
-                {{name}} hello
-            </div>
-        <span>{{age}}</span>
+    <div id="app" style="color:red;background: yellow;">
+        <div style="color:green" key="123">
+                {{name}} hello{{age}}hello
+        </div>
+        <li>world</li>
     </div>
     <script src="./vue.js"></script>
     <script>
@@ -28,16 +28,36 @@
             },
             el:"#app",  //将数据解析到el元素上
         })
-        vm.hobby.push("333")
-        // console.log(vm._data.hobby[2].a);
 
-        //解析模板参数
-
-        //模板引擎  性能差  正则匹配  
-        // 虚拟dom 数据变化后比较虚拟dom的差异 最后更新需要更新的地方
-        //核心就是我们要把模板解析成js语法，通过js语法生成虚拟dom
+        //nextTick不是开启了一个异步任务，而是将这个任务维护到了一个队列中
 
 
+        vm.$nextTick(()=>{  //放在队列中 多次调用合并成一次 队列  变量  异步操作
+            console.log(app.innerHTML);
+        })
+        vm.name = "李寻欢";  //也是放到nextTick中进行处理
+        
+
+
+
+
+    /* 
+        依赖收集的逻辑
+            给每一个属性增加一个dep属性，将渲染逻辑放在watcher中，用dep对watcher进行收集，当属性发生变化的时候，将watcher拿出来进行渲染即可
+
+
+        属性劫持，渲染逻辑的时候将watcehr放在全局，dep.target。get方法的时候dep.target
+        去重 new set方法  has add  数组中 add.subs()   双向收集  多对多的关系  多对多的关系
+
+
+        set方法  subs将所有的watcher拿出来进行执行  
+            异步更新 nextTick  不是开启了一个异步任务而是将异步任务维护起来   p处理
+        watcher取出来  
+            next 
+    
+    
+    
+    */
     </script>
 </body>
 </html>
