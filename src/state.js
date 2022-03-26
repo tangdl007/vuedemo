@@ -1,4 +1,3 @@
-import { watch } from "rollup";
 import Dep from "./observe/dep.js";
 import { observe } from "./observe/index.js";
 import Watcher from "./observe/watcher.js";
