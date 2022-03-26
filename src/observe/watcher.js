@@ -1,23 +1,47 @@
-import { VERSION } from "rollup";
-import Dep from "./dep";
+import Dep, { popTarget, pushTarget } from "./dep";
 
 //局部更新 提高性能
 let id = 0;
 
 class Watcher {
-    constructor(vm, fn, options) {  //每个组件都会new watcher
+    constructor(vm, exprOrFn, options, cb) {  //每个组件都会new watcher
         this.id = id++;
 
         this.renderWatcher = options;//是否为渲染watcher
-        this.getter = fn;
+
+        if(typeof exprOrFn == 'string'){
+            this.getter = function(){
+                return vm[exprOrFn]
+            }
+        }else{
+            this.getter = exprOrFn;
+        }
         this.deps = [];  //实现计算属性和清理工作需要用到
         this.depsId = new Set();
-        this.get()
+        this.lazy = options.lazy;
+        this.cb = cb;
+        this.dirty = this.lazy;
+        this.vm = vm;
+        this.user = options.user;
+
+        this.value = this.lazy ? undefined : this.get();
+
     }
-    get() {
-        Dep.target = this; //静态属性只有一份 为什么不放在原型上  原型行要通过实例来调用 只想通过类来进行调用
-        this.getter();
-        Dep.target = null;
+    evaluate() {
+        this.value = this.get();
+        this.dirty = false;
+    }
+    get() {  //get方法的时候会进行依赖收集 那么改变的时候回执行这个watcher
+        pushTarget(this);
+        let value = this.getter.call(this.vm);
+        popTarget();
+        return value;
+    }
+    depend() {
+        let i = this.deps.length;
+        while (i--) {
+            this.deps[i].depend();  //让计算属性watcher也收集渲染watcher
+        }
     }
     addDep(dep) {  //既要保证不重复  又要保证双向  
         let id = dep.id;
@@ -29,10 +53,18 @@ class Watcher {
     }
     update() {
         //实现异步更新的操作   update无论走多少次 更新操作只有一次
-        queueWatcher(this);
+        if (this.lazy) {
+            this.dirty = true;
+        } else {
+            queueWatcher(this);
+        }
     }
     run() {
-        this.get();
+        let oldValue = this.value;
+        let newValue = this.get();
+        if(this.user){
+            this.cb.call(this.vm,newValue,oldValue);
+        }
     }
 }
 
@@ -104,7 +136,8 @@ export function nextTick(cb) {    //先用户的还是先内部的  异步更新
 }
 
 // mixin 可以混入一些公共的方法  数据来源不明确   
-
+// 计算属性根本就不会去收集依赖而是让自己的依赖去收集依赖
+// 异步更新 取最后的值
 
 
 

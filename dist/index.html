@@ -7,46 +7,30 @@
     <title>Document</title>
 </head>
 <body>
-    <div id="app" style="color:red;background: yellow;">
-        <div style="color:green" key="123">
-                {{name}} hello{{age}}hello
-        </div>
-        <li>world</li>
+    <div id="app">
+        {{firstName}}
     </div>
     <script src="./vue.js"></script>
     <script>
-        //响应式的数据变化 数据变化之后我们能监控到
         const vm = new Vue({
+            el:"#app",
             data:{
-                name:"zf",
-                age:12,
-                adress:{
-                    number:100,
-                    content:"回龙观"
-                },
-                hobby:['drink','eat',{a:1}]
+                firstName:"珠",
+                lastName:"峰"
             },
-            el:"#app",  //将数据解析到el元素上
+            watch:{
+                firstName(newValue,oldValue){
+                    console.log(newValue,oldValue);
+                }
+            }
         })
-
-        //nextTick不是开启了一个异步任务，而是将这个任务维护到了一个队列中
-
-
-        vm.$nextTick(()=>{  //放在队列中 多次调用合并成一次 队列  变量  异步操作
-            console.log(app.innerHTML);
-        })
-        vm.name = "李寻欢";  //也是放到nextTick中进行处理
         
+        setTimeout(()=>{
+            vm.firstName = "xxx"
+        },1000)
 
 
 
-
-    /* 
-        
-    
-    
-    
-    */
     </script>
 </body>
 </html>
