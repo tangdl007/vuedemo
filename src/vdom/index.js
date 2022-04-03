@@ -15,6 +15,10 @@ export function createTextVNode(vm,text){
 }
 
 
+export function isSameVnode(vnode1,vnode2){
+    return vnode1.tag === vnode2.tag && vnode1.key === vnode2.key;
+}
+
 
 //ast是语法层面上的转化  描述的语法本身
 //虚拟dom描述的是dom元素  可以增加一些自定义属性

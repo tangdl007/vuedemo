@@ -40,6 +40,8 @@ methods.forEach(method => {
             ob.observeArr(inserted);
         }
 
+        //更新
+        ob.dep.notify();
         return result;
     }
 })

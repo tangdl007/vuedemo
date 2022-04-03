@@ -8,36 +8,20 @@
 </head>
 <body>
     <div id="app" style="color:red;background: yellow;">
-       
     </div>
     <script src="./vue.js"></script>
     <script> 
-        //响应式的数据变化 数据变化之后我们能监控到  混入一些公共的方法  数据来源不明确  扩展一些功能
-        Vue.mixin({
-            created(){
-                console.log('mixin1-created');
-            }
-
-        })
-        Vue.mixin({
-            created(){
-                console.log('mixin2-created');
-            }
-        })
     
 
         
         const vm = new Vue({
+            el:"#app",
             data:{
-                name:"zf",
-                age:20
+                arr:[1,2,3]  //只重写了数组的方法 没有监控长度
             },
-            created(){
-                console.log('created');
-            }
         })
 
-   
+        vm.arr.push(100);  //改变的是arr属性并不是，arr对象的数组对象  数组没有收集依赖
     </script>
 </body>
 </html>

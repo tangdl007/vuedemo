@@ -41,7 +41,7 @@ export function parseHTML(html){ //解析一个删除一个 知道没有解析�
     }
 
     function chars(text){
-        text = text.replace(/\s/g,"");
+        text = text.replace(/\s/g,'');
         text && currentParent.children.push({
             type:TEXT_TYPE,
             text,

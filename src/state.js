@@ -1,6 +1,6 @@
 import Dep from "./observe/dep.js";
 import { observe } from "./observe/index.js";
-import Watcher from "./observe/watcher.js";
+import Watcher, { nextTick } from "./observe/watcher.js";
 
 export function initState(vm) {
     let opts = vm.$options;
@@ -104,6 +104,14 @@ function createComputedGetter(key) {
     }
 }
 
+export function initStateMixin(Vue){
+    Vue.prototype.$nextTick = nextTick;
+    Vue.prototype.$watch = function(exprOrFn,cb){
+        //属性的值改变之后 直接执行cb就行
+        new Watcher(this,exprOrFn,{user:true},cb); //用户自己写的watcher
+    }
+}
+
 
 
 //首先初始化数据  vue2 兼容ie9以上  vue3抛弃了ie   proxy进行属性劫持
@@ -119,7 +127,7 @@ function createComputedGetter(key) {
         属性发生变化的时候
         渲染watcher收集到
     
-
+    
 
 
 */
