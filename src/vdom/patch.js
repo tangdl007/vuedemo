@@ -121,9 +121,24 @@ function updateChildren(el,oldChildren,newChildren){
     let oldEndVnode = oldChildren[oldEndIndex];
     let newEndVnode = newChildren[newEndIndex];
 
+    function makeIndexByKey(children){
+        let map = {};
+        children.forEach((child,index) => {
+            map[child.key] = index
+        })
+        return map
+    }
+
+    let map = makeIndexByKey(oldChildren); //key对应的索引 老的  a:1
+
+
+
     while(oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex){  //头指针超过尾指针的时候就结束
-        //头头比对
-        if(isSameVnode(oldStartVnode,newStartVnode)){
+        if(!oldStartVnode){  //为空的情况进行处理
+            oldStartVnode = oldChildren[++oldStartIndex]
+        }else if(!oldEndVnode){
+            oldEndVnode = oldChildren[--oldEndIndex]
+        }else if(isSameVnode(oldStartVnode,newStartVnode)){
             patchVnode(oldStartVnode,newStartVnode);
             oldStartVnode = oldChildren[++oldStartIndex];
             newStartVnode = newChildren[++newStartIndex];
@@ -136,7 +151,25 @@ function updateChildren(el,oldChildren,newChildren){
             el.insertBefore(oldEndVnode.el,oldStartVnode.el)
             oldEndVnode = oldChildren[--oldEndIndex];
             newStartVnode = newChildren[++newStartIndex];
+        }else if(isSameVnode(oldStartVnode,newEndVnode)){//老的头和新的尾比较
+            patchVnode(oldStartVnode,newEndVnode);
+            el.insertBefore(oldStartVnode.el,oldEndVnode.el.nextSibling);  //a插入到b的前面  
+            newEndVnode = newChildren[--newEndIndex];
+            oldStartVnode = oldChildren[++oldStartIndex]; 
+        }else {
+            let moveIndex = map[newStartVnode.key];
+            if(moveIndex !== undefined){
+                let moveVnode = oldChildren[moveIndex];
+                el.insertBefore(moveVnode.el,oldStartVnode.el);
+                oldChildren[moveIndex] = undefined; //不能删 删了就会数组塌陷
+                patchVnode(moveVnode,newStartVnode);
+            }else{
+                el.insertBefore(createElm(newStartVnode),oldStartVnode.el)
+            }
+    
+            newStartVnode = newChildren[++newStartIndex];  //尽可能的复用老的 以老的为标准  找到就移动找不到就插入
         }
+        
     }
     if(newStartIndex <= newEndIndex){
         for(let i = newStartIndex;i <= newEndIndex;i++){
@@ -149,8 +182,10 @@ function updateChildren(el,oldChildren,newChildren){
     }
     if(oldStartIndex <= oldEndIndex){
         for(let i=oldStartIndex;i<=oldEndIndex;i++){
-            let oldEl = oldChildren[i].el;
-            el.removeChild(oldEl);
+            if(oldChildren[i]){
+                let oldEl = oldChildren[i].el;
+                el.removeChild(oldEl);
+            }
         }
     }
 }
@@ -159,12 +194,33 @@ function updateChildren(el,oldChildren,newChildren){
 
 
 
-//比较虚拟dom 尽可能的服用老的 提升性能
-//节点比较  节点不同 tag和key
-//文本节点  
-//元素节点  props  老的有的新的没有去掉  新的覆盖老的
-//比较儿子  双指针的方式  头指针超过尾指针的时候结束  超过的部分 追加或者去除
-//是一个概念  
+//虚拟dom之间的比较  尽可能的复用老的 提升性能
+//根节点是不是一致的 不是一致的新的覆盖老的  key 和 tag  标签是不是一致的
+//节点如果是一致的 元素节点和文本节点  元素节点 比较props  两点  老的有的新的没有直接去除 新的覆盖老的
+//比较儿子  头头比较 双指针的方式  头指针大于尾指针的时候结束  尾尾比较  交叉比较
+//老的尾和新的头比较
+//永远都往头指针做插入
+//如果批量向页面中插入内容 浏览器会自动优化
+//组件渲染原理
+
+
+
+/* 
+    说下diff算法吧  两个虚拟dom之间的比较 尽可能的复用老的节约性能
+
+
+    采取的是双指针的方式进行比较  头头和头比较 比较节点 key tag  文本节点
+    元素节点 属性比较 老的有新的没有去除  
+    然后在比较儿子
+        头和头比较 头指针超过尾指针就结束
+        尾和尾比较  
+        交叉比较
+        乱序比较 将老做一个映射关系  新的最前面  当前头指针的最前面  
+    不加key 会有bug 比如复用错误 
+    循环列表 勾选状态  苹果 香蕉 梨  火龙果  就被勾选了
+    
+*/
+
 
 
 
