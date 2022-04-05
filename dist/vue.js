@@ -71,7 +71,7 @@
 
       Vue.component = function (id, definition) {
         definition = typeof definition == 'function' ? definition : Vue.extend(definition);
-        Vue.options.components[id] = definition; //directives
+        Vue.options.components[id] = definition; //保存在 options.components
       };
     }
 

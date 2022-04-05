@@ -15,7 +15,7 @@
     </div>
     <script src="./vue.js"></script>
     <script>
-        //1、自定义标签  2、自己的属性和方法  3、插槽
+        //1、自定义标签  2、自己的属性和方法  3、插槽 
 
 
         //全局组件  创建一个组件可以在模板中进行使用
@@ -25,12 +25,19 @@
 
         // vue.extend 创建一个组件的构造函数可以直接进行挂载
         let Sub = Vue.extend({  //根据用户的参数返回一个构造函数而已 继承Vue 走Vue的初始化
-            template:'<button>点我啊 <my-button></my-button></button>'
+            template:'<button>点我啊 <my-button></my-button></button>',
+            components:{
+                'my-button':{
+                    template:"<button>点我啊</button>"
+                }
+            }
         })
 
         new Sub().$mount('#root');
 
-
+        //创建一个组件的构造函数 可以直接进行挂载  
+        //创建一个组件在模板中进行使用 
+        
     </script>
 </body>
 </html>
