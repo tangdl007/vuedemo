@@ -11,17 +11,8 @@ export function initLifeCycle(Vue) {
         const vm = this;
         const el = vm.$el;
 
-        const prevVnode = vm._vnode;
-        vm._vnode = vnode
-        
-        if(prevVnode){
-            vm.$el = patch(prevVnode,vnode);
-        }else{
-            vm.$el = patch(el, vnode); 
-        }
-
-
-
+        //既有初始化的功能又有更新的功能
+        vm.$el = patch(el, vnode); //新的el
     }
     Vue.prototype._c = function () {
         return createElementVNode(this, ...arguments);

@@ -7,37 +7,21 @@
     <title>Document</title>
 </head>
 <body>
-    <div id="app">
-        <my-button></my-button>
-        <my-button></my-button>
-    </div>
-    <div id="root">
+    <div id="app" style="color:red;background: yellow;">
     </div>
     <script src="./vue.js"></script>
-    <script>
-        //1、自定义标签  2、自己的属性和方法  3、插槽 
+    <script> 
+    
 
-
-        //全局组件  创建一个组件可以在模板中进行使用
-        Vue.component('my-button',Vue.extend({
-            template:'<button>点我塞</button>'
-        }))  
-
-        // vue.extend 创建一个组件的构造函数可以直接进行挂载
-        let Sub = Vue.extend({  //根据用户的参数返回一个构造函数而已 继承Vue 走Vue的初始化
-            template:'<button>点我啊 <my-button></my-button></button>',
-            components:{
-                'my-button':{
-                    template:"<button>点我啊</button>"
-                }
-            }
+        
+        const vm = new Vue({
+            el:"#app",
+            data:{
+                arr:[1,2,3]  //只重写了数组的方法 没有监控长度
+            },
         })
 
-        new Sub().$mount('#root');
-
-        //创建一个组件的构造函数 可以直接进行挂载  
-        //创建一个组件在模板中进行使用 
-        
+        vm.arr.push(100);  //改变的是arr属性并不是，arr对象的数组对象  数组没有收集依赖
     </script>
 </body>
 </html>
