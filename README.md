@@ -102,7 +102,42 @@ vue中异步组件的写法有很多主要用作大的组件可以进行异步�
 - $parent $children 就是在创造子组件的时候，会将父组件的实例传入。在组件本身初始化的时候会构建组件间的父子关系。通过$parent来获取父组件的实例，通过$children来获取子组件的实例。
 - ref 可以获取dom和组件实例（虚拟dom没有处理ref，这里无法拿到实例 也无法获取组件实例）  虚拟dom是不依赖平台代码的。创建dom的时候如何处理ref？会将用户所有的dom操作和属性 都维护到一个cbs属性中（create,update,insert,destroy...）。依次调用cbs中create方法。这里就包含ref相关的操作，会操作ref并且赋值。
 - inject provide （将父组件的属性暴露出来） 在后代组件中通过inject注入属性  在父组件中提供数据，在子组件汇总递归查找
-- $attrs $listeners
+- $attrs（所有组件上的属性 不涵盖props） $listeners （组件上所有的事件）   
+- Vue.observalble 可以创建一个全局的对象用于通信
+- Vuex
+## v-if和v-for哪个优先级更高   
+> v-for的优先级更高，在编译的时候 会将v-for渲染成_l函数 v-if会变成三元表达式  v-if和v-for不要进行联用 
+v-if（控制是否渲染） / v-show（控制样式 visibility：hidden display:none） v-show="true" 放在span上会变成块元素吗？为什么不用 visibility：hidden？（占位 不响应事件） 为什么不用opacity（响应事件 占位）
+> v-if在编译的时候 会变成三元表达式 但是v-show会变成一个指令
+## v-if,v-model,v-for的实现原理
+- v-if会编译成三元表达式
+- v-for会编译成_l循环
+- v-model 干什么的？ 放在表单元素上可是实现双向绑定，放在组件上就不一样了
+    - v-model 放在不同的元素上会编译出不同的结果，针对文本来说会处理文本 （会被编译成 value + input + 指令处理） 中文输入开始 中文输入完毕 compositionStart compositionEnd  
+    value 和 input实现双向绑定阻止中文触发 指令作用就是处理中文输入完毕之后 手动触发更新
+    - v-model绑定到组件上 这里编译一个model对象 组件会创建虚拟节点的时候会有这样一个对象。会看一下里面是否有自定义的props和event，如果没有则会被解析成input + value的语法糖 
+## vue中，sync 修饰符的作用，用法及原理。
+    -和v-model，这个api是为了实现状态同步，这个东西在vue3中被移除了
+    绑定一个属性和更新时间
+## Vue.use是干什么的？原理是什么？
+- 这里的use方法，目的是将Vue的构造函数传递给插件中，让所有插件依赖的vue是同一个版本 
+- 默认调用插件 或者 插件的install方法
+- vue-router和vuex里面package的依赖里面是没有vue。是通过参数传递进去的。
+## 组件中写name选项有哪些好处及作用
+- 在vue中有name属性的组件可以被递归调用（在写模板语法的时候，我们可以通过name属性递归调用自己）
+- 在声明组件的时候 Sub.options.components[name] = Sub  他把自己的构造函数放在name属性上了
+
+- 我们用来标识组件 通过name来找到对应的组件 自己封装跨级通信
+- name属性可以用作devtool调试工具 来标明具体的组件
+
+
+
+
+
+
+
+
+
 
 
 
